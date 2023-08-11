@@ -150,7 +150,7 @@ new_melody = original_melody.create_nths_melody(3, 2)
 # new_melody.play()
 new_melody.write_melody("new.mid")
 
-
+pattern = [1, 0.5, 0.5, 0.5, 0.5, 1]
 melodic_pattern = new_melody.melodic_pattern(pattern)
 
 melodic_pattern.play()
