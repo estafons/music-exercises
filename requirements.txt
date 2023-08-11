@@ -1,0 +1,4 @@
+greenlet==2.0.2
+MIDIUtil==1.2.1
+mido==1.2.10
+msgpack==1.0.5
