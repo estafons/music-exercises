@@ -122,22 +122,6 @@ class Melody:
             MyMIDI.writeFile(output_file)
 
 
-def random_pattern(numenator, denominator, notes_in_pattern=4):
-    from random import random
-    time_values_map = {
-        1: 4,
-        2: 2,
-        4: 1,
-        8: 0.5,
-        16: 0.25,
-        32: 0.125
-    }
-    total_beats = numenator * time_values_map[denominator]
-    beat_pattern = [random() for _ in range(notes_in_pattern)]
-    total = sum(beat_pattern)
-    scale = total_beats / total
-    beat_pattern = [beat * scale for beat in beat_pattern]
-    return beat_pattern
 
 # Example usage
 original_melody = Melody()
@@ -166,7 +150,6 @@ new_melody = original_melody.create_nths_melody(3, 2)
 # new_melody.play()
 new_melody.write_melody("new.mid")
 
-pattern = random_pattern(4, 4, 4)
 
 melodic_pattern = new_melody.melodic_pattern(pattern)
 
