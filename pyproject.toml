@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "musicality"
+version = "0.1.0"
+description = ""
+authors = ["Stefanos Koutoupis <skoutoupis@scify.org>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+MIDIUtil = "^1.2.1"
+deap = "^1.4.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

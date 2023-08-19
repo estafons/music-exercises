@@ -1,15 +1,9 @@
-from midiutil import MIDIFile
-
-class Note:
-    def __init__(self, pitch, duration):
-        self.pitch = pitch
-        self.duration = duration
-        self.index = None
-        self.time = None
-
+from musicality.classes.note import Note
 class Melody:
-    def __init__(self):
+    def __init__(self, notes=None):
         self.notes = []
+        if notes:
+            self.extend(notes)
 
     def __len__(self):
         return len(self.notes)
@@ -28,6 +22,12 @@ class Melody:
     def __reversed__(self):
         return reversed(self.notes)
     
+    def __add__(self, other):
+        new_melody = Melody()
+        new_melody.extend(self.notes)
+        new_melody.extend(other.notes)
+        return new_melody
+    
     def append(self, note):
         note.index = len(self.notes)
         previous_note = self.get_previous_note(note)
@@ -38,9 +38,38 @@ class Melody:
         self.notes.append(note)
 
     def extend(self, notes):
+        from copy import deepcopy
+        notes = deepcopy(notes)
         for note in notes:
-            self.append(note)
+            if isinstance(note, Note):
 
+                self.append(note)
+            elif isinstance(note, int):
+                self.append(Note(
+                    note
+                ))
+            elif isinstance(note, tuple):
+                self.append(Note(
+                    note[0],
+                    note[1]
+                ))
+            elif isinstance(note, list):
+                if isinstance(note[0], int):
+                    for n in note:
+                        self.append(Note(n))
+                elif isinstance(note[0], tuple):
+                    for n in note:
+                        self.append(Note(
+                            n[0],
+                            n[1]
+                        ))
+                elif isinstance(note[0], Note):
+                    for n in note:
+                        self.append(n)
+            else:
+                print(note)
+                type(note)
+                raise TypeError("Invalid type for note")
     def insert(self, index, note):
         self.notes.insert(index, note)
         self.reindex()
@@ -113,86 +142,18 @@ class Melody:
             ))
         return new_melody
 
-    def write_melody(self, filename):
+    def genetize_melody(self, scale):
+        from musicality.genetic import genetic
+        winner, generations = genetic(self.notes, scale)
+        print(f"Generations: {generations}")
+        print(winner)
+        return Melody(winner)
+    
+    def write_melody(self, filename, track=0, channel=0, tempo=60, volume=100):
+        from midiutil import MIDIFile
         MyMIDI = MIDIFile(1) # One track, defaults to format 1 (tempo track
-        MyMIDI.addTempo(track, time, tempo)
+        MyMIDI.addTempo(track, 0, tempo)
         for note in self.notes:    
             MyMIDI.addNote(track, channel, note.pitch, note.time, note.duration, volume)
         with open(filename, "wb") as output_file:
             MyMIDI.writeFile(output_file)
-
-class Chord:
-    def __init__(self, root_note, chord_type, extension=None):
-        self.root = root_note
-        self.chord_type = chord_type
-        self.extension = extension
-        self.third = self.get_third()
-        self.fifth = self.get_fifth()
-        self.extended = self.get_extended()
-
-    def get_third(self):
-        if self.chord_type == "major":
-            return self.root + 4
-        elif self.chord_type == "minor" or self.chord_type == "diminished":
-            return self.root + 3
-
-    def get_fifth(self):
-        if self.extension == "diminished":
-            return self.root + 6
-        return self.root + 7
-    
-    def get_extended(self):
-        if self.extension == "seventh":
-            return self.root + 10
-        elif self.extension == "diminished":
-            return self.root + 9
-
-    def arpeggio(self, inversion):
-        import itertools
-        ''' return an arpeggio for a given inversion.
-         take into account the possibility that there is not an extended note'''
-        if self.extended:
-            arpeggio = [self.root, self.third, self.fifth, self.extended]
-        else:
-            arpeggio = [self.root, self.third, self.fifth]
-        inverted_arpeggio = [arpeggio[index % len(arpeggio)] + 12*int(index/len(arpeggio)) for index in range(inversion, len(arpeggio) + inversion)]
-        return inverted_arpeggio
-
-majorChord = Chord(60, "major")
-print(majorChord.arpeggio(0))
-print(majorChord.arpeggio(1))
-print(majorChord.arpeggio(2))
-print(majorChord.arpeggio(6))
-# Example usage
-original_melody = Melody()
-degrees  = [40, 42, 44, 45, 47, 49, 51, 52] # MIDI note number
-track    = 0
-channel  = 0
-time     = 0   # In beats
-duration = 1   # In beats
-tempo    = 60  # In BPM
-volume   = 100 
-original_melody.extend([
-    Note(40, 0.5),
-    Note(42, 0.5),
-    Note(44, 0.5),
-    Note(45, 0.5),
-    Note(47, 0.5),
-    Note(49, 0.5),
-    Note(51, 0.5),
-    Note(52, 0.5)
-])
-original_melody.write_melody("original.mid")
-# print(original_melody.notes.indices(0, len(original_melody), 1))
-new_melody = original_melody.create_nths_melody(3, 2)
-
-
-# new_melody.play()
-new_melody.write_melody("new.mid")
-
-pattern = [1, 0.5, 0.5, 0.5, 0.5, 1]
-melodic_pattern = new_melody.melodic_pattern(pattern)
-
-melodic_pattern.play()
-melodic_pattern.write_melody("melodic_pattern.mid")
-
