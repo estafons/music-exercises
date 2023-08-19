@@ -5,6 +5,7 @@ from musicality.constants import INSTRUMENT_RANGE
 
 
 def mutate(melody):
+    from musicality.classes.note import Note
     from musicality.constants import NOTE_MUTATION_RATE
     from random import randint
     from random import random 
