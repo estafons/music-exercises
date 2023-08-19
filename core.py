@@ -121,8 +121,48 @@ class Melody:
         with open(filename, "wb") as output_file:
             MyMIDI.writeFile(output_file)
 
+class Chord:
+    def __init__(self, root_note, chord_type, extension=None):
+        self.root = root_note
+        self.chord_type = chord_type
+        self.extension = extension
+        self.third = self.get_third()
+        self.fifth = self.get_fifth()
+        self.extended = self.get_extended()
 
+    def get_third(self):
+        if self.chord_type == "major":
+            return self.root + 4
+        elif self.chord_type == "minor" or self.chord_type == "diminished":
+            return self.root + 3
 
+    def get_fifth(self):
+        if self.extension == "diminished":
+            return self.root + 6
+        return self.root + 7
+    
+    def get_extended(self):
+        if self.extension == "seventh":
+            return self.root + 10
+        elif self.extension == "diminished":
+            return self.root + 9
+
+    def arpeggio(self, inversion):
+        import itertools
+        ''' return an arpeggio for a given inversion.
+         take into account the possibility that there is not an extended note'''
+        if self.extended:
+            arpeggio = [self.root, self.third, self.fifth, self.extended]
+        else:
+            arpeggio = [self.root, self.third, self.fifth]
+        inverted_arpeggio = [arpeggio[index % len(arpeggio)] + 12*int(index/len(arpeggio)) for index in range(inversion, len(arpeggio) + inversion)]
+        return inverted_arpeggio
+
+majorChord = Chord(60, "major")
+print(majorChord.arpeggio(0))
+print(majorChord.arpeggio(1))
+print(majorChord.arpeggio(2))
+print(majorChord.arpeggio(6))
 # Example usage
 original_melody = Melody()
 degrees  = [40, 42, 44, 45, 47, 49, 51, 52] # MIDI note number
