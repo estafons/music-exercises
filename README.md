@@ -2,6 +2,8 @@
 
 This repo holds a PoC for writting a tool to generate music excercises ideas.
 
+For an easy to run CLI for this package checkout: https://github.com/estafons/musicality-cli
+
 ### Given an initial idea (melody) we can:
 
 - Play "nths'" (sixteenth's, triplets etc). 
