@@ -26,8 +26,19 @@ def mutate(melody):
     return new_melody
 
 def evaluate(melody, scale):
-    return _in_scale_score(melody, scale) + _semitone_extension_of__melody_score(melody) + _is_subtonic(melody, scale), 0
+    # print("in_scale: ", _in_scale_score(melody, scale))
+    # print("semitone extension: ", _semitone_extension_of__melody_score(melody))
+    # print("is subtonic: ", _is_subtonic(melody, scale))
+    # print("large interval: ", _large_interval_score(melody))
+    return _in_scale_score(melody, scale) + _semitone_extension_of__melody_score(melody) + \
+        + _large_interval_score(melody) + _is_subtonic(melody, scale), 0
 
+def _large_interval_score(melody):
+    from musicality.constants import LARGE_INTERVAL_SCORE_FACTOR
+    score = 0
+    for i, k in zip(melody[0::2], melody[1::2]):
+        score -= abs(k.pitch-i.pitch)/len(melody)
+    return score/LARGE_INTERVAL_SCORE_FACTOR
 
 def _in_scale_score(melody, scale):
     from musicality.constants import IN_SCALE_REWARD_FACTOR
