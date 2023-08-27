@@ -157,3 +157,12 @@ class Melody:
             MyMIDI.addNote(track, channel, note.pitch, note.time, note.duration, volume)
         with open(filename, "wb") as output_file:
             MyMIDI.writeFile(output_file)
+
+    def create_midi(self, track=0, channel=0, tempo=60, volume=100):
+        from midiutil import MIDIFile
+        MyMIDI = MIDIFile(1)
+        MyMIDI.addTempo(track, 0, tempo)
+        for note in self.notes:
+            MyMIDI.addNote(track, channel, note.pitch, note.time, note.duration, volume)
+        return MyMIDI
+
